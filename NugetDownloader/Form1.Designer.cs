@@ -85,7 +85,7 @@
 			// 
 			// label8
 			// 
-			this.label8.Location = new System.Drawing.Point(12, 78);
+			this.label8.Location = new System.Drawing.Point(12, 57);
 			this.label8.Name = "label8";
 			this.label8.Size = new System.Drawing.Size(310, 38);
 			this.label8.TabIndex = 13;
@@ -93,7 +93,7 @@
 			// 
 			// label7
 			// 
-			this.label7.Location = new System.Drawing.Point(12, 34);
+			this.label7.Location = new System.Drawing.Point(12, 13);
 			this.label7.Name = "label7";
 			this.label7.Size = new System.Drawing.Size(310, 38);
 			this.label7.TabIndex = 12;
@@ -102,7 +102,7 @@
 			// 
 			// btnDownload
 			// 
-			this.btnDownload.Location = new System.Drawing.Point(15, 173);
+			this.btnDownload.Location = new System.Drawing.Point(12, 206);
 			this.btnDownload.Name = "btnDownload";
 			this.btnDownload.Size = new System.Drawing.Size(75, 23);
 			this.btnDownload.TabIndex = 11;
@@ -112,19 +112,20 @@
 			// 
 			// textBox1
 			// 
-			this.textBox1.Location = new System.Drawing.Point(15, 147);
+			this.textBox1.Location = new System.Drawing.Point(15, 120);
+			this.textBox1.Multiline = true;
 			this.textBox1.Name = "textBox1";
-			this.textBox1.Size = new System.Drawing.Size(320, 20);
+			this.textBox1.Size = new System.Drawing.Size(320, 80);
 			this.textBox1.TabIndex = 9;
 			// 
 			// label5
 			// 
 			this.label5.AutoSize = true;
-			this.label5.Location = new System.Drawing.Point(12, 131);
+			this.label5.Location = new System.Drawing.Point(12, 104);
 			this.label5.Name = "label5";
-			this.label5.Size = new System.Drawing.Size(268, 13);
+			this.label5.Size = new System.Drawing.Size(273, 13);
 			this.label5.TabIndex = 8;
-			this.label5.Text = "Desired Nuget Package (url or package.version.nupkg)";
+			this.label5.Text = "Desired Nuget Packages (url or package.version.nupkg)";
 			// 
 			// btnDefault
 			// 
