@@ -26,11 +26,37 @@ namespace NugetDownloader
 				normalize = normalize.Substring(index);
 			}
 			Match match = versionRegex.Match(normalize);
-			name = normalize.Substring(0, match.Index-1);
-			version = match.Value;
+			if (match.Length > 0 && match.Index > 0)
+			{
+				name = normalize.Substring(0, match.Index-1);
+				version = match.Value;
+			}
 		}
 
-		public string getFileName()
+		public static bool TryParse(string psPath, out Nuget pNuget)
+		{
+			Nuget result = new Nuget(psPath);
+			if (result.IsValid())
+			{
+				pNuget = result;
+				return true;
+			}
+			pNuget = null;
+			return false;
+		}
+
+		public bool IsValid()
+		{
+			return
+			(
+				(name != null) &&
+				(name != "") &&
+				(version != null) &&
+				(version != "")
+			);
+		}
+
+		public string GetFileName()
 		{
 			return string.Format(
 				"{0}.{1}.nupkg",
@@ -38,7 +64,7 @@ namespace NugetDownloader
 				version.ToLower()
 			);
 		}
-		public string getNugetPath()
+		public string GetNugetPath()
 		{
 			return string.Format(
 				"{0}/{1}/{0}.{1}.nupkg",

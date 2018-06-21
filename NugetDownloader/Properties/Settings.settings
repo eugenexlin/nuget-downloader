@@ -14,5 +14,11 @@
     <Setting Name="RemoteNugetPath" Type="System.String" Scope="User">
       <Value Profile="(Default)">https://api.nuget.org/v3-flatcontainer/</Value>
     </Setting>
+    <Setting Name="TargetFramework" Type="System.String" Scope="User">
+      <Value Profile="(Default)">.NETStandard</Value>
+    </Setting>
+    <Setting Name="TargetFrameworkVersion" Type="System.String" Scope="User">
+      <Value Profile="(Default)">2.0</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

@@ -1,0 +1,4 @@
+entityframework.4.1.10715.nupkg
+Newtonsoft.Json.11.0.2.nupkg
+Microsoft.AspNet.WebApi.Client.5.2.5-preview1.nupkg
+System.Net.Http.4.3.3.nupkg

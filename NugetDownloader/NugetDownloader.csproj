@@ -51,6 +51,7 @@
     <Compile Include="DownloadDashboard.Designer.cs">
       <DependentUpon>DownloadDashboard.cs</DependentUpon>
     </Compile>
+    <Compile Include="NugetManagerParams.cs" />
     <Compile Include="DownloadInputForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -58,9 +59,14 @@
       <DependentUpon>DownloadInputForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Nuget.cs" />
+    <Compile Include="NugetDownloaderWorker.cs" />
     <Compile Include="NugetManager.cs" />
+    <Compile Include="NugetProgressItem.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="DownloadDashboard.resx">
+      <DependentUpon>DownloadDashboard.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="DownloadInputForm.resx">
       <DependentUpon>DownloadInputForm.cs</DependentUpon>
     </EmbeddedResource>

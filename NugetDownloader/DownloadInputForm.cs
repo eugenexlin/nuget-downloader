@@ -20,38 +20,52 @@ namespace NugetDownloader
 		}
 		private void Form1_Load(object sender, EventArgs e)
 		{
-			loadSettings();
+			LoadSettings();
 		}
 
-		private void loadSettings()
+		private void LoadSettings()
 		{
 			txtRemoteNugetPath.Text = Properties.Settings.Default.RemoteNugetPath;
 			txtLocalNugetPath.Text = Properties.Settings.Default.LocalNugetPath;
 			txtStagingNugetPath.Text = Properties.Settings.Default.StagingNugetPath;
 			txtOutputReportPath.Text = Properties.Settings.Default.OutputReportPath;
+			txtFramework.Text = Properties.Settings.Default.TargetFramework;
+			txtFrameworkVersion.Text = Properties.Settings.Default.TargetFrameworkVersion;
+		}
+
+		private bool ValidateAll()
+		{
+			StringBuilder errors = new StringBuilder();
+			String error;
+
+			error = ValidatePath(txtLocalNugetPath.Text);
+			if (error.Length > 0)
+			{
+				errors.AppendLine(error);
+			}
+			error = ValidatePath(txtStagingNugetPath.Text);
+			if (error.Length > 0)
+			{
+				errors.AppendLine(error);
+			}
+			error = ValidatePath(txtOutputReportPath.Text);
+			if (error.Length > 0)
+			{
+				errors.AppendLine(error);
+			}
+			if (errors.Length > 0)
+			{
+				MessageBox.Show(errors.ToString());
+				return false;
+			}
+			return true;
 		}
 
 		private void btnSave_Click(object sender, EventArgs e)
 		{
 			// validations
-			string errors;
-			
-			errors = validatePath(txtLocalNugetPath.Text);
-			if (errors.Length > 0)
+			if(!ValidateAll())
 			{
-				MessageBox.Show(errors);
-				return;
-			}
-			errors = validatePath(txtStagingNugetPath.Text);
-			if (errors.Length > 0)
-			{
-				MessageBox.Show(errors);
-				return;
-			}
-			errors = validatePath(txtOutputReportPath.Text);
-			if (errors.Length > 0)
-			{
-				MessageBox.Show(errors);
 				return;
 			}
 
@@ -59,18 +73,20 @@ namespace NugetDownloader
 			Properties.Settings.Default.LocalNugetPath = txtLocalNugetPath.Text;
 			Properties.Settings.Default.StagingNugetPath = txtStagingNugetPath.Text;
 			Properties.Settings.Default.OutputReportPath = txtOutputReportPath.Text;
+			Properties.Settings.Default.TargetFramework = txtFramework.Text;
+			Properties.Settings.Default.TargetFrameworkVersion = txtFrameworkVersion.Text;
 			Properties.Settings.Default.Save();
-			loadSettings();
+			LoadSettings();
 		}
 
 		private void txtPath_Leave(object sender, EventArgs e)
 		{
-			textLeaveHandler(((TextBox)sender).Text);
+			TextLeaveHandler(((TextBox)sender).Text);
 		}
 
-		private void textLeaveHandler(string text)
+		private void TextLeaveHandler(string text)
 		{
-			string errors = validatePath(text);
+			string errors = ValidatePath(text);
 			if (errors.Length > 0)
 			{
 				MessageBox.Show(errors);
@@ -80,13 +96,13 @@ namespace NugetDownloader
 			{
 				if (!Directory.Exists(text))
 				{
-					promptCreatePath(text);
+					PromptCreatePath(text);
 					return;
 				}
 			}
 		}
 
-		private void promptCreatePath(string path)
+		private bool PromptCreatePath(string path)
 		{
 			var confirmResult = MessageBox.Show(
 									String.Format(
@@ -99,15 +115,25 @@ namespace NugetDownloader
 			if (confirmResult == DialogResult.Yes)
 			{
 				Directory.CreateDirectory(path);
+				return true;
 			}
 			else
 			{
-				
+				return false;
 			}
 		}
 
+		private bool ValidatePathExists(string path)
+		{
+			if (!Directory.Exists(path))
+			{
+				MessageBox.Show(String.Format("Path '{0}' does not exist.", path));
+				return false;
+			}
+			return true;
+		}
 
-		private string validatePath(string path)
+		private string ValidatePath(string path)
 		{
 			StringBuilder errors = new StringBuilder();
 			try
@@ -139,12 +165,54 @@ namespace NugetDownloader
 		{
 			Properties.Settings.Default.Reset();
 			Properties.Settings.Default.Save();
-			loadSettings();
+			LoadSettings();
 		}
 
 		private void btnDownload_Click(object sender, EventArgs e)
 		{
-			DownloadDashboard form = new DownloadDashboard();
+			if (!ValidateAll())
+			{
+				return;
+			}
+			if (!ValidatePathExists(txtLocalNugetPath.Text))
+			{
+				if (!PromptCreatePath(txtLocalNugetPath.Text)){
+					return;
+				}
+			}
+			if (!ValidatePathExists(txtStagingNugetPath.Text))
+			{
+				if (!PromptCreatePath(txtStagingNugetPath.Text))
+				{
+					return;
+				}
+			}
+			if (!ValidatePathExists(txtOutputReportPath.Text))
+			{
+				if (!PromptCreatePath(txtOutputReportPath.Text))
+				{
+					return;
+				}
+			}
+
+			NugetManagerParams p = new NugetManagerParams();
+			p.localNugetPath = txtLocalNugetPath.Text;
+			p.stagingNugetPath = txtStagingNugetPath.Text;
+			p.remoteNugetPath = txtRemoteNugetPath.Text;
+			p.outputReportPath = txtOutputReportPath.Text;
+
+			p.framework = txtFramework.Text;
+			p.frameworkVersion = txtFrameworkVersion.Text;
+
+			char[] split = { '\n' };
+			Nuget nuget;
+			foreach (string sNuget in txtNugets.Text.Split(split, StringSplitOptions.RemoveEmptyEntries)) {
+				if (Nuget.TryParse(sNuget, out nuget)) {
+					p.nugetsToDownload.Add(nuget);
+				}
+			}
+
+			DownloadDashboard form = new DownloadDashboard(p);
 			form.Show();
 		}
 	}

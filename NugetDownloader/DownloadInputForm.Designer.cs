@@ -32,7 +32,7 @@
 			this.label8 = new System.Windows.Forms.Label();
 			this.label7 = new System.Windows.Forms.Label();
 			this.btnDownload = new System.Windows.Forms.Button();
-			this.textBox1 = new System.Windows.Forms.TextBox();
+			this.txtNugets = new System.Windows.Forms.TextBox();
 			this.label5 = new System.Windows.Forms.Label();
 			this.btnDefault = new System.Windows.Forms.Button();
 			this.txtRemoteNugetPath = new System.Windows.Forms.TextBox();
@@ -45,6 +45,10 @@
 			this.txtLocalNugetPath = new System.Windows.Forms.TextBox();
 			this.label2 = new System.Windows.Forms.Label();
 			this.label1 = new System.Windows.Forms.Label();
+			this.txtFramework = new System.Windows.Forms.ComboBox();
+			this.label9 = new System.Windows.Forms.Label();
+			this.txtFrameworkVersion = new System.Windows.Forms.TextBox();
+			this.label10 = new System.Windows.Forms.Label();
 			((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
 			this.splitContainer1.Panel1.SuspendLayout();
 			this.splitContainer1.Panel2.SuspendLayout();
@@ -63,11 +67,15 @@
 			this.splitContainer1.Panel1.Controls.Add(this.label8);
 			this.splitContainer1.Panel1.Controls.Add(this.label7);
 			this.splitContainer1.Panel1.Controls.Add(this.btnDownload);
-			this.splitContainer1.Panel1.Controls.Add(this.textBox1);
+			this.splitContainer1.Panel1.Controls.Add(this.txtNugets);
 			this.splitContainer1.Panel1.Controls.Add(this.label5);
 			// 
 			// splitContainer1.Panel2
 			// 
+			this.splitContainer1.Panel2.Controls.Add(this.label10);
+			this.splitContainer1.Panel2.Controls.Add(this.txtFrameworkVersion);
+			this.splitContainer1.Panel2.Controls.Add(this.label9);
+			this.splitContainer1.Panel2.Controls.Add(this.txtFramework);
 			this.splitContainer1.Panel2.Controls.Add(this.btnDefault);
 			this.splitContainer1.Panel2.Controls.Add(this.txtRemoteNugetPath);
 			this.splitContainer1.Panel2.Controls.Add(this.label6);
@@ -79,13 +87,13 @@
 			this.splitContainer1.Panel2.Controls.Add(this.txtLocalNugetPath);
 			this.splitContainer1.Panel2.Controls.Add(this.label2);
 			this.splitContainer1.Panel2.Controls.Add(this.label1);
-			this.splitContainer1.Size = new System.Drawing.Size(584, 241);
+			this.splitContainer1.Size = new System.Drawing.Size(584, 321);
 			this.splitContainer1.SplitterDistance = 360;
 			this.splitContainer1.TabIndex = 0;
 			// 
 			// label8
 			// 
-			this.label8.Location = new System.Drawing.Point(12, 57);
+			this.label8.Location = new System.Drawing.Point(9, 50);
 			this.label8.Name = "label8";
 			this.label8.Size = new System.Drawing.Size(310, 38);
 			this.label8.TabIndex = 13;
@@ -102,7 +110,7 @@
 			// 
 			// btnDownload
 			// 
-			this.btnDownload.Location = new System.Drawing.Point(12, 206);
+			this.btnDownload.Location = new System.Drawing.Point(12, 286);
 			this.btnDownload.Name = "btnDownload";
 			this.btnDownload.Size = new System.Drawing.Size(75, 23);
 			this.btnDownload.TabIndex = 11;
@@ -110,26 +118,27 @@
 			this.btnDownload.UseVisualStyleBackColor = true;
 			this.btnDownload.Click += new System.EventHandler(this.btnDownload_Click);
 			// 
-			// textBox1
+			// txtNugets
 			// 
-			this.textBox1.Location = new System.Drawing.Point(15, 120);
-			this.textBox1.Multiline = true;
-			this.textBox1.Name = "textBox1";
-			this.textBox1.Size = new System.Drawing.Size(320, 80);
-			this.textBox1.TabIndex = 9;
+			this.txtNugets.Location = new System.Drawing.Point(15, 120);
+			this.txtNugets.Multiline = true;
+			this.txtNugets.Name = "txtNugets";
+			this.txtNugets.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+			this.txtNugets.Size = new System.Drawing.Size(320, 160);
+			this.txtNugets.TabIndex = 9;
 			// 
 			// label5
 			// 
 			this.label5.AutoSize = true;
 			this.label5.Location = new System.Drawing.Point(12, 104);
 			this.label5.Name = "label5";
-			this.label5.Size = new System.Drawing.Size(273, 13);
+			this.label5.Size = new System.Drawing.Size(289, 13);
 			this.label5.TabIndex = 8;
-			this.label5.Text = "Desired Nuget Packages (url or package.version.nupkg)";
+			this.label5.Text = "Desired Nuget Packages (line separated url or nupkg name)";
 			// 
 			// btnDefault
 			// 
-			this.btnDefault.Location = new System.Drawing.Point(88, 193);
+			this.btnDefault.Location = new System.Drawing.Point(88, 233);
 			this.btnDefault.Name = "btnDefault";
 			this.btnDefault.Size = new System.Drawing.Size(75, 23);
 			this.btnDefault.TabIndex = 10;
@@ -155,7 +164,7 @@
 			// 
 			// btnSave
 			// 
-			this.btnSave.Location = new System.Drawing.Point(7, 193);
+			this.btnSave.Location = new System.Drawing.Point(7, 233);
 			this.btnSave.Name = "btnSave";
 			this.btnSave.Size = new System.Drawing.Size(75, 23);
 			this.btnSave.TabIndex = 7;
@@ -226,13 +235,50 @@
 			this.label1.TabIndex = 0;
 			this.label1.Text = "Settings";
 			// 
-			// Form1
+			// txtFramework
+			// 
+			this.txtFramework.FormattingEnabled = true;
+			this.txtFramework.Items.AddRange(new object[] {
+            ".NETFramework",
+            ".NETCore",
+            ".NETStandard"});
+			this.txtFramework.Location = new System.Drawing.Point(7, 206);
+			this.txtFramework.Name = "txtFramework";
+			this.txtFramework.Size = new System.Drawing.Size(120, 21);
+			this.txtFramework.TabIndex = 11;
+			// 
+			// label9
+			// 
+			this.label9.AutoSize = true;
+			this.label9.Location = new System.Drawing.Point(4, 190);
+			this.label9.Name = "label9";
+			this.label9.Size = new System.Drawing.Size(93, 13);
+			this.label9.TabIndex = 12;
+			this.label9.Text = "Target Framework";
+			// 
+			// txtFrameworkVersion
+			// 
+			this.txtFrameworkVersion.Location = new System.Drawing.Point(133, 206);
+			this.txtFrameworkVersion.Name = "txtFrameworkVersion";
+			this.txtFrameworkVersion.Size = new System.Drawing.Size(74, 20);
+			this.txtFrameworkVersion.TabIndex = 13;
+			// 
+			// label10
+			// 
+			this.label10.AutoSize = true;
+			this.label10.Location = new System.Drawing.Point(130, 190);
+			this.label10.Name = "label10";
+			this.label10.Size = new System.Drawing.Size(42, 13);
+			this.label10.TabIndex = 14;
+			this.label10.Text = "Version";
+			// 
+			// DownloadInputForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(584, 241);
+			this.ClientSize = new System.Drawing.Size(584, 321);
 			this.Controls.Add(this.splitContainer1);
-			this.Name = "Form1";
+			this.Name = "DownloadInputForm";
 			this.Text = "Nuget Downloader";
 			this.Load += new System.EventHandler(this.Form1_Load);
 			this.splitContainer1.Panel1.ResumeLayout(false);
@@ -256,7 +302,7 @@
 		private System.Windows.Forms.TextBox txtOutputReportPath;
 		private System.Windows.Forms.Label label4;
 		private System.Windows.Forms.Button btnSave;
-		private System.Windows.Forms.TextBox textBox1;
+		private System.Windows.Forms.TextBox txtNugets;
 		private System.Windows.Forms.Label label5;
 		private System.Windows.Forms.TextBox txtRemoteNugetPath;
 		private System.Windows.Forms.Label label6;
@@ -264,6 +310,10 @@
 		private System.Windows.Forms.Label label8;
 		private System.Windows.Forms.Label label7;
 		private System.Windows.Forms.Button btnDownload;
+		private System.Windows.Forms.Label label9;
+		private System.Windows.Forms.ComboBox txtFramework;
+		private System.Windows.Forms.Label label10;
+		private System.Windows.Forms.TextBox txtFrameworkVersion;
 	}
 }
 
