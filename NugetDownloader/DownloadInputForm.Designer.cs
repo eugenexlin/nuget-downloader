@@ -1,6 +1,6 @@
 ﻿namespace NugetDownloader
 {
-	partial class Form1
+	partial class DownloadInputForm
 	{
 		/// <summary>
 		/// Required designer variable.

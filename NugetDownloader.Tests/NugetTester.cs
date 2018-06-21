@@ -37,11 +37,26 @@ namespace NugetDownloader.Tests
 			);
 		}
 
-		public void testNugetParse(
+		[TestMethod]
+		public void TestNugetNameGeneration()
+		{
+			Nuget nuget1 = new Nuget("https://api.nuget.org/v3-flatcontainer/entityframework/4.1.10715/entityframework.4.1.10715.nupkg");
+			Assert.AreEqual("entityframework/4.1.10715/entityframework.4.1.10715.nupkg", nuget1.getNugetPath());
+			Nuget nuget2 = new Nuget(nuget1.getNugetPath());
+			Assert.AreEqual("entityframework/4.1.10715/entityframework.4.1.10715.nupkg", nuget2.getNugetPath());
+			Nuget nuget3 = new Nuget(nuget1.getFileName());
+			Assert.AreEqual("entityframework.4.1.10715.nupkg", nuget3.getFileName());
+			Assert.AreEqual(nuget1.name, nuget3.name);
+			Assert.AreEqual(nuget1.version, nuget3.version);
+
+		}
+
+		public void testNugetParse
+		(
 			string input, 
 			string expectedName, 
 			string expectedVersion
-			)
+		)
 		{
 			Nuget nuget = new Nuget(input);
 			Assert.AreEqual(expectedName, nuget.name);

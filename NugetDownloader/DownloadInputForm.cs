@@ -11,9 +11,10 @@ using System.IO;
 
 namespace NugetDownloader
 {
-	public partial class Form1 : Form
+	public partial class DownloadInputForm : Form
 	{
-		public Form1()
+
+		public DownloadInputForm()
 		{
 			InitializeComponent();
 		}
@@ -143,7 +144,8 @@ namespace NugetDownloader
 
 		private void btnDownload_Click(object sender, EventArgs e)
 		{
-
+			DownloadDashboard form = new DownloadDashboard();
+			form.Show();
 		}
 	}
 }

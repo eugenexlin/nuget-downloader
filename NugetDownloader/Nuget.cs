@@ -30,7 +30,7 @@ namespace NugetDownloader
 			version = match.Value;
 		}
 
-		public string getFile()
+		public string getFileName()
 		{
 			return string.Format(
 				"{0}.{1}.nupkg",
