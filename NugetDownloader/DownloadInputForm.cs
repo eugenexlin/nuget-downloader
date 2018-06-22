@@ -212,6 +212,13 @@ namespace NugetDownloader
 				}
 			}
 
+			if (p.nugetsToDownload.Count <= 0)
+			{
+
+				MessageBox.Show("No nugets detected.");
+				return;
+			}
+
 			DownloadDashboard form = new DownloadDashboard(p);
 			form.Show();
 		}

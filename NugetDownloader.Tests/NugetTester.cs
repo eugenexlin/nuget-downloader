@@ -68,7 +68,7 @@ namespace NugetDownloader.Tests
 			Assert.AreEqual("entityframework/4.1.10715/entityframework.4.1.10715.nupkg", nuget2.GetNugetPath());
 			Nuget nuget3 = new Nuget(nuget1.GetFileName());
 			Assert.AreEqual("entityframework.4.1.10715.nupkg", nuget3.GetFileName());
-			Assert.AreEqual(nuget1.name, nuget3.name);
+			Assert.AreEqual(nuget1.id, nuget3.id);
 			Assert.AreEqual(nuget1.version, nuget3.version);
 
 		}
@@ -81,7 +81,7 @@ namespace NugetDownloader.Tests
 		)
 		{
 			Nuget nuget = new Nuget(input);
-			Assert.AreEqual(expectedName, nuget.name);
+			Assert.AreEqual(expectedName, nuget.id);
 			Assert.AreEqual(expectedVersion, nuget.version);
 		}
 	}

@@ -103,6 +103,7 @@ namespace NugetDownloader
 						else
 						{
 							IsDownloading = true;
+							mManager.AddNewNugetReportItem(nuget);
 
 							string Url = mManager.mParams.remoteNugetPath + nuget.GetNugetPath();
 
@@ -135,7 +136,7 @@ namespace NugetDownloader
 					}
 					catch (Exception ex)
 					{
-						WriteConsole("Error in worker thread: " + ex.Message);
+						WriteConsole("Error in worker thread: " + ex.ToString());
 						if (nuget != null)
 						{
 							mManager.ForceAddNugetToQueue(nuget);
@@ -213,7 +214,11 @@ namespace NugetDownloader
 			{
 				if (!File.Exists(sourcePath))
 				{
-					throw new Exception(String.Format("File {0} not found.", sourcePath));
+					throw new Exception(String.Format("File '{0}' not found.", sourcePath));
+				}
+				if (new FileInfo(sourcePath).Length <= 0)
+				{
+					throw new Exception(String.Format("File '{0}' has zero size. Maybe this version does not exist?", sourcePath));
 				}
 				if (Directory.Exists(tempFolder))
 				{
@@ -239,13 +244,16 @@ namespace NugetDownloader
 					throw;
 				}
 
-				string nuspecPath = tempFolder + currentNugetProgress.nuget.name + ".nuspec";
+				string nuspecPath = tempFolder + currentNugetProgress.nuget.id + ".nuspec";
 				XmlDocument nuspecDoc = new XmlDocument();
 				using (XmlTextReader xtr = new XmlTextReader(nuspecPath))
 				{
 					xtr.Namespaces = false;
 					nuspecDoc.Load(xtr);
 				}
+
+				mManager.UpdateNewNugetReportItem(currentNugetProgress.nuget, (XmlElement)nuspecDoc.SelectSingleNode("package/metadata"));
+
 				XmlElement xDependencies = (XmlElement)nuspecDoc.SelectSingleNode("package/metadata/dependencies");
 
 				if (xDependencies == null)

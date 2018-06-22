@@ -53,6 +53,8 @@
     <Compile Include="DownloadDashboard.Designer.cs">
       <DependentUpon>DownloadDashboard.cs</DependentUpon>
     </Compile>
+    <Compile Include="NewNugetReportItem.cs" />
+    <Compile Include="NewNugetReportItemComparer.cs" />
     <Compile Include="NugetManagerParams.cs" />
     <Compile Include="DownloadInputForm.cs">
       <SubType>Form</SubType>

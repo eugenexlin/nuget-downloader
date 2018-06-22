@@ -3,13 +3,13 @@
   <Profiles />
   <Settings>
     <Setting Name="LocalNugetPath" Type="System.String" Scope="User">
-      <Value Profile="(Default)">C:\Nuget\</Value>
+      <Value Profile="(Default)">C:\Nuget\Live\</Value>
     </Setting>
     <Setting Name="StagingNugetPath" Type="System.String" Scope="User">
-      <Value Profile="(Default)">C:\Temp\Nuget\</Value>
+      <Value Profile="(Default)">C:\Nuget\Stage\</Value>
     </Setting>
     <Setting Name="OutputReportPath" Type="System.String" Scope="User">
-      <Value Profile="(Default)">C:\Nuget\Report\</Value>
+      <Value Profile="(Default)">C:\Nuget\Reports\</Value>
     </Setting>
     <Setting Name="RemoteNugetPath" Type="System.String" Scope="User">
       <Value Profile="(Default)">https://api.nuget.org/v3-flatcontainer/</Value>

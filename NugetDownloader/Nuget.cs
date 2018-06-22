@@ -10,7 +10,7 @@ namespace NugetDownloader
 	public class Nuget
 	{
 
-		public string name;
+		public string id;
 		// major.minor.patch[-suffix]
 		public string version;
 
@@ -28,13 +28,13 @@ namespace NugetDownloader
 			Match match = versionRegex.Match(normalize);
 			if (match.Length > 0 && match.Index > 0)
 			{
-				name = normalize.Substring(0, match.Index-1);
+				id = normalize.Substring(0, match.Index-1);
 				version = match.Value;
 			}
 		}
 		public Nuget(string psName, string psVersion)
 		{
-			name = psName;
+			id = psName;
 			version = psVersion;
 		}
 
@@ -54,8 +54,8 @@ namespace NugetDownloader
 		{
 			return
 			(
-				(name != null) &&
-				(name != "") &&
+				(id != null) &&
+				(id != "") &&
 				(version != null) &&
 				(version != "")
 			);
@@ -65,7 +65,7 @@ namespace NugetDownloader
 		{
 			return string.Format(
 				"{0}.{1}.nupkg",
-				name.ToLower(),
+				id.ToLower(),
 				version.ToLower()
 			);
 		}
@@ -73,7 +73,7 @@ namespace NugetDownloader
 		{
 			return string.Format(
 				"{0}/{1}/",
-				name.ToLower(),
+				id.ToLower(),
 				version.ToLower()
 			);
 		}
@@ -81,7 +81,7 @@ namespace NugetDownloader
 		{
 			return string.Format(
 				"{0}/{1}/{0}.{1}.nupkg",
-				name.ToLower(),
+				id.ToLower(),
 				version.ToLower()
 			);
 		}

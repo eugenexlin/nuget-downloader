@@ -25,7 +25,7 @@ namespace NugetDownloader.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("C:\\Nuget\\")]
+        [global::System.Configuration.DefaultSettingValueAttribute("C:\\Nuget\\Live\\")]
         public string LocalNugetPath {
             get {
                 return ((string)(this["LocalNugetPath"]));
@@ -37,7 +37,7 @@ namespace NugetDownloader.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("C:\\Temp\\Nuget\\")]
+        [global::System.Configuration.DefaultSettingValueAttribute("C:\\Nuget\\Stage\\")]
         public string StagingNugetPath {
             get {
                 return ((string)(this["StagingNugetPath"]));
@@ -49,7 +49,7 @@ namespace NugetDownloader.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("C:\\Nuget\\Report\\")]
+        [global::System.Configuration.DefaultSettingValueAttribute("C:\\Nuget\\Reports\\")]
         public string OutputReportPath {
             get {
                 return ((string)(this["OutputReportPath"]));
