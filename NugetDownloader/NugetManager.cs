@@ -4,17 +4,20 @@ using System.Collections.Concurrent;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.ComponentModel;
 
 namespace NugetDownloader
 {
 	public class NugetManager
 	{
 
-		public event NugetQueuedHandler NugetQueued;
-		public delegate void NugetQueuedHandler(NugetManager m, NugetQueuedArgs e);
+		public event NugetProgressChangedHandler ProgressChanged;
+		public delegate void NugetProgressChangedHandler(NugetManager m, NugetProgressArgs e);
 
-		public event WriteConsoleHandler WroteConsole;
-		public delegate void WriteConsoleHandler(NugetManager m, WriteConsoleArgs e);
+		// removing this because cross thread txt access not allowed.
+		// apparently event handlers are dont on the thread that called the event.
+		//public event WriteConsoleHandler WroteConsole;
+		//public delegate void WriteConsoleHandler(NugetManager m, WriteConsoleArgs e);
 
 		private const int THREAD_COUNT = 4;
 
@@ -29,6 +32,8 @@ namespace NugetDownloader
 		private HashSet<string> mNugetsFileNamesAlreadyAdded = new HashSet<string>();
 
 		private List<NugetProgressItem> mNugetProgressItems = new List<NugetProgressItem>();
+		
+		public ConcurrentQueue<string> consoleOutput = new ConcurrentQueue<string>();
 
 		public NugetManager(NugetManagerParams p)
 		{
@@ -37,9 +42,19 @@ namespace NugetDownloader
 
 		public void WriteConsole(string message)
 		{
-			WriteConsoleArgs args = new WriteConsoleArgs();
-			args.message = message;
-			WroteConsole(this, args);
+			//WriteConsoleArgs args = new WriteConsoleArgs();
+			//args.message = message;
+
+			string sTime = DateTime.Now.ToLongTimeString() + " - ";
+			if (message.EndsWith(Environment.NewLine))
+			{
+				consoleOutput.Enqueue(sTime + message);
+			}
+			else
+			{
+				consoleOutput.Enqueue(sTime + message + Environment.NewLine);
+			}
+			//WroteConsole(this, args);
 		}
 
 		private bool CriticalIsNugetRepeatCheck(Nuget nuget)
@@ -56,17 +71,30 @@ namespace NugetDownloader
 			}
 		}
 
+
+		// at this point should be on UI thread
+		private void WorkerProgressChanged(object sender, ProgressChangedEventArgs e)
+		{
+			NugetProgressItem nugetProgress = (NugetProgressItem)e.UserState;
+			NugetProgressArgs args = new NugetProgressArgs();
+			args.nugetProgress = nugetProgress;
+			ProgressChanged(this, args);
+		}
+
+		// only use when there is an error and we might want to try it again.
+		public void ForceAddNugetToQueue(Nuget nuget)
+		{
+			WriteConsole(String.Format("Queuing {0}", nuget.GetFileName()));
+			mNugetsToProcess.Enqueue(nuget);
+		}
+
 		public void AddNugetToQueue(Nuget nuget)
 		{
 			if (CriticalIsNugetRepeatCheck(nuget))
 			{
 				return;
 			}
-
-			NugetQueuedArgs args = new NugetQueuedArgs();
-			args.nuget = nuget;
-			NugetQueued(this, args);
-			mNugetsToProcess.Enqueue(nuget);
+			ForceAddNugetToQueue(nuget);
 		}
 
 		public Nuget DequeueNuget()
@@ -93,14 +121,31 @@ namespace NugetDownloader
 			//spawn worker threads
 			for (int i = 0; i < THREAD_COUNT; i++)
 			{
-				NugetDownloaderWorker worker = new NugetDownloaderWorker(this);
+				BackgroundWorker bgwrk = new BackgroundWorker();
+				bgwrk.ProgressChanged += new ProgressChangedEventHandler(WorkerProgressChanged);
+				NugetDownloaderWorker worker = new NugetDownloaderWorker(this, i, bgwrk);
 				mWorkers.Add(worker);
 			}
+			// activate them after they are all in, because collection would change
+			// in IsStillDoingWork
+			foreach (NugetDownloaderWorker worker in mWorkers)
+			{
+				worker.Start();
+			}
+
 			//wait for them all to terminate.
 
 		}
 
-
+		public void Dispose()
+		{
+			// activate them after they are all in, because collection would change
+			// in IsStillDoingWork
+			foreach (NugetDownloaderWorker worker in mWorkers)
+			{
+				worker.Dispose();
+			}
+		}
 
 		// this is basically the function that workers use to coordinate if they
 		// should keep looping to process the queue;
@@ -121,15 +166,15 @@ namespace NugetDownloader
 			}
 			return false;
 		}
-
 	}
-
-	public class NugetQueuedArgs: EventArgs
+	
+	public class NugetProgressArgs : EventArgs
 	{
-		public Nuget nuget { get; set; }
+		public NugetProgressItem nugetProgress { get; set; }
 	}
-	public class WriteConsoleArgs : EventArgs
-	{
-		public string message { get; set; }
-	}
+
+	//public class WriteConsoleArgs : EventArgs
+	//{
+	//	public string message { get; set; }
+	//}
 }

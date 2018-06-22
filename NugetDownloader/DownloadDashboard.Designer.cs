@@ -31,19 +31,16 @@
 			this.panDownloads = new System.Windows.Forms.Panel();
 			this.tlpDownloads = new System.Windows.Forms.TableLayoutPanel();
 			this.panel1 = new System.Windows.Forms.Panel();
-			this.panel2 = new System.Windows.Forms.Panel();
-			this.txtConsole = new System.Windows.Forms.TextBox();
-			this.label1 = new System.Windows.Forms.Label();
+			this.lblOutput = new System.Windows.Forms.Label();
+			this.lbConsole = new System.Windows.Forms.ListBox();
 			this.panDownloads.SuspendLayout();
 			this.panel1.SuspendLayout();
-			this.panel2.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// panDownloads
 			// 
 			this.panDownloads.AutoScroll = true;
 			this.panDownloads.Controls.Add(this.tlpDownloads);
-			this.panDownloads.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.panDownloads.Location = new System.Drawing.Point(0, 0);
 			this.panDownloads.Name = "panDownloads";
 			this.panDownloads.Size = new System.Drawing.Size(360, 537);
@@ -71,50 +68,40 @@
 			this.panel1.Size = new System.Drawing.Size(360, 537);
 			this.panel1.TabIndex = 1;
 			// 
-			// panel2
+			// lblOutput
 			// 
-			this.panel2.Controls.Add(this.label1);
-			this.panel2.Controls.Add(this.txtConsole);
-			this.panel2.Location = new System.Drawing.Point(378, 12);
-			this.panel2.Name = "panel2";
-			this.panel2.Size = new System.Drawing.Size(394, 537);
-			this.panel2.TabIndex = 2;
+			this.lblOutput.AutoSize = true;
+			this.lblOutput.Location = new System.Drawing.Point(378, 9);
+			this.lblOutput.Name = "lblOutput";
+			this.lblOutput.Size = new System.Drawing.Size(39, 13);
+			this.lblOutput.TabIndex = 1;
+			this.lblOutput.Text = "Output";
 			// 
-			// txtConsole
+			// lbConsole
 			// 
-			this.txtConsole.Location = new System.Drawing.Point(3, 28);
-			this.txtConsole.MaxLength = 100000;
-			this.txtConsole.Multiline = true;
-			this.txtConsole.Name = "txtConsole";
-			this.txtConsole.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-			this.txtConsole.Size = new System.Drawing.Size(388, 506);
-			this.txtConsole.TabIndex = 0;
-			// 
-			// label1
-			// 
-			this.label1.AutoSize = true;
-			this.label1.Location = new System.Drawing.Point(3, 12);
-			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(39, 13);
-			this.label1.TabIndex = 1;
-			this.label1.Text = "Output";
+			this.lbConsole.FormattingEnabled = true;
+			this.lbConsole.Location = new System.Drawing.Point(378, 25);
+			this.lbConsole.Name = "lbConsole";
+			this.lbConsole.Size = new System.Drawing.Size(394, 524);
+			this.lbConsole.TabIndex = 2;
 			// 
 			// DownloadDashboard
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(784, 561);
-			this.Controls.Add(this.panel2);
+			this.Controls.Add(this.lbConsole);
+			this.Controls.Add(this.lblOutput);
 			this.Controls.Add(this.panel1);
 			this.Name = "DownloadDashboard";
 			this.Text = "DownloadDashboard";
+			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.DownloadDashboard_FormClosing);
 			this.Load += new System.EventHandler(this.DownloadDashboard_Load);
 			this.panDownloads.ResumeLayout(false);
 			this.panDownloads.PerformLayout();
 			this.panel1.ResumeLayout(false);
-			this.panel2.ResumeLayout(false);
-			this.panel2.PerformLayout();
 			this.ResumeLayout(false);
+			this.PerformLayout();
 
 		}
 
@@ -122,8 +109,7 @@
 		private System.Windows.Forms.Panel panDownloads;
 		private System.Windows.Forms.TableLayoutPanel tlpDownloads;
 		private System.Windows.Forms.Panel panel1;
-		private System.Windows.Forms.Panel panel2;
-		private System.Windows.Forms.TextBox txtConsole;
-		private System.Windows.Forms.Label label1;
+		private System.Windows.Forms.Label lblOutput;
+		private System.Windows.Forms.ListBox lbConsole;
 	}
 }

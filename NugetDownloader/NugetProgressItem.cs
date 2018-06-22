@@ -8,5 +8,10 @@ namespace NugetDownloader
 {
 	public class NugetProgressItem
 	{
+		public NugetProgressItem(Nuget pNuget)
+		{
+			nuget = pNuget;
+		}
+		public Nuget nuget { get; private set; }
 	}
 }
