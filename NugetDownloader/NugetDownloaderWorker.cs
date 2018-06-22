@@ -107,9 +107,10 @@ namespace NugetDownloader
 
 							string Url = mManager.mParams.remoteNugetPath + nuget.GetNugetPath();
 
-							// HERE YOU CAN SPECIFY IF YOU WANT FOLDER STRUCTURE
-							// OR JUST BUNCHA NUGETS AT ROOT
-							string downloadPath = mManager.mParams.stagingNugetPath + nuget.GetNugetPath().Replace("/", "\\");
+							// have not figured out nuget folder structure yet.
+							// will go will nugets in root.
+							//string downloadPath = mManager.mParams.stagingNugetPath + nuget.GetNugetPath().Replace("/", "\\");
+							string downloadPath = mManager.mParams.stagingNugetPath + nuget.GetFileName();
 							string parentDir = Path.GetDirectoryName(downloadPath);
 							if (!Directory.Exists(parentDir))
 							{
