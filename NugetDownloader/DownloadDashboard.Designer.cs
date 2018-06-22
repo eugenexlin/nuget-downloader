@@ -41,9 +41,10 @@
 			// 
 			this.panDownloads.AutoScroll = true;
 			this.panDownloads.Controls.Add(this.tlpDownloads);
+			this.panDownloads.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.panDownloads.Location = new System.Drawing.Point(0, 0);
 			this.panDownloads.Name = "panDownloads";
-			this.panDownloads.Size = new System.Drawing.Size(360, 537);
+			this.panDownloads.Size = new System.Drawing.Size(360, 737);
 			this.panDownloads.TabIndex = 0;
 			// 
 			// tlpDownloads
@@ -65,7 +66,7 @@
 			this.panel1.Controls.Add(this.panDownloads);
 			this.panel1.Location = new System.Drawing.Point(12, 12);
 			this.panel1.Name = "panel1";
-			this.panel1.Size = new System.Drawing.Size(360, 537);
+			this.panel1.Size = new System.Drawing.Size(360, 737);
 			this.panel1.TabIndex = 1;
 			// 
 			// lblOutput
@@ -80,16 +81,16 @@
 			// lbConsole
 			// 
 			this.lbConsole.FormattingEnabled = true;
-			this.lbConsole.Location = new System.Drawing.Point(378, 25);
+			this.lbConsole.Location = new System.Drawing.Point(381, 25);
 			this.lbConsole.Name = "lbConsole";
-			this.lbConsole.Size = new System.Drawing.Size(394, 524);
+			this.lbConsole.Size = new System.Drawing.Size(391, 719);
 			this.lbConsole.TabIndex = 2;
 			// 
 			// DownloadDashboard
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(784, 561);
+			this.ClientSize = new System.Drawing.Size(784, 761);
 			this.Controls.Add(this.lbConsole);
 			this.Controls.Add(this.lblOutput);
 			this.Controls.Add(this.panel1);

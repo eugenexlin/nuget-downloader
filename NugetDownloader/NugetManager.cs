@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.ComponentModel;
+using System.Threading;
 
 namespace NugetDownloader
 {
@@ -22,6 +23,9 @@ namespace NugetDownloader
 		private const int THREAD_COUNT = 4;
 
 		private List<NugetDownloaderWorker> mWorkers = new List<NugetDownloaderWorker>();
+
+		private bool HasError = false;
+		private bool HasWarning = false;
 
 		private bool mIsStarted = false;
 		public NugetManagerParams mParams;
@@ -133,8 +137,48 @@ namespace NugetDownloader
 				worker.Start();
 			}
 
-			//wait for them all to terminate.
+			//waiting thread so we can return thread to UI work.
+			Thread managerThread = new Thread(() => {
+				//wait for them all to terminate.
+				bool workersRunning = true;
+				while (workersRunning)
+				{
+					Thread.Sleep(200);
+					workersRunning = false;
+					foreach (NugetDownloaderWorker worker in mWorkers)
+					{
+						if (!worker.IsFinished)
+						{
+							workersRunning = true;
+							break;
+						}
+					}
+				}
 
+				// ok everything should be done.
+				if (HasError)
+				{
+					WriteConsole("Task has ended with ERROR!!");
+				}
+				else if(HasWarning)
+				{
+					WriteConsole("Task has ended with warning!");
+				}
+				else
+				{
+					WriteConsole("Task is a likely success!");
+				}
+			});
+			managerThread.Start();
+		}
+
+		public void RaiseTheFlagOfError()
+		{
+			HasError = true;
+		}
+		public void RaiseTheFlagOfWarning()
+		{
+			HasWarning = true;
 		}
 
 		public void Dispose()

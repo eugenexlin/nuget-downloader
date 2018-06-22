@@ -16,7 +16,7 @@ namespace NugetDownloader
 
 		public static Regex versionRegex = new Regex("\\d+\\.\\d+\\.\\d+(\\-[0-9A-Za-z-]+)?");
 
-		//pass in nuget path, get
+		//pass in nuget path
 		public Nuget(string psPath)
 		{
 			string normalize = psPath.Replace("\\", "/");
@@ -31,6 +31,11 @@ namespace NugetDownloader
 				name = normalize.Substring(0, match.Index-1);
 				version = match.Value;
 			}
+		}
+		public Nuget(string psName, string psVersion)
+		{
+			name = psName;
+			version = psVersion;
 		}
 
 		public static bool TryParse(string psPath, out Nuget pNuget)
@@ -60,6 +65,14 @@ namespace NugetDownloader
 		{
 			return string.Format(
 				"{0}.{1}.nupkg",
+				name.ToLower(),
+				version.ToLower()
+			);
+		}
+		public string GetFolderName()
+		{
+			return string.Format(
+				"{0}/{1}/",
 				name.ToLower(),
 				version.ToLower()
 			);

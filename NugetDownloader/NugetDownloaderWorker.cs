@@ -7,6 +7,8 @@ using System.Threading;
 using System.ComponentModel;
 using System.Net;
 using System.IO;
+using System.IO.Compression;
+using System.Xml;
 
 namespace NugetDownloader
 {
@@ -17,6 +19,10 @@ namespace NugetDownloader
 		private NugetManager mManager;
 		private int mId;
 		public bool IsProcessing { get; private set; } = true;
+		public bool IsFinished { get; private set; } = false;
+
+		private int workerFailureCount = 0;
+		private const int MAX_FAILURE_COUNT = 3;
 
 		private bool IsDownloading = false;
 		private bool isAborting = false;
@@ -34,7 +40,7 @@ namespace NugetDownloader
 
 			webClient = new WebClient();
 			webClient.DownloadProgressChanged += new DownloadProgressChangedEventHandler(DownloadProgress);
-			webClient.DownloadDataCompleted += new DownloadDataCompletedEventHandler(DownloadCompleted);
+			webClient.DownloadFileCompleted += new AsyncCompletedEventHandler(DownloadCompleted);
 
 			mWorker = worker;
 			mWorker.WorkerReportsProgress = true;
@@ -62,72 +68,94 @@ namespace NugetDownloader
 
 		private void ProcessUntilDone(object sender, DoWorkEventArgs args)
 		{
-			while (mManager.IsStillDoingWork())
+			try
 			{
-				if (isAborting)
-				{
-					return;
-				}
 
-				Nuget nuget = null;
-				try
+				while (mManager.IsStillDoingWork())
 				{
-
-					nuget = mManager.DequeueNuget();
-					if (nuget == null)
+					if (isAborting)
 					{
-						IsProcessing = false;
-						Thread.Sleep(100);
+						return;
+					}
+
+					Nuget nuget = null;
+					try
+					{
+
+						nuget = mManager.DequeueNuget();
+						if (nuget == null)
+						{
+							IsProcessing = false;
+							Thread.Sleep(100);
+							continue;
+						}
+						IsProcessing = true;
+						WriteConsole(String.Format("Processing {0}", nuget.GetFileName()));
+						currentNugetProgress = new NugetProgressItem(nuget);
+						ReportProgress();
+
+						if (isNugetAlreadyInLocal())
+						{
+							WriteConsole(String.Format("Found Existing '{0}'", currentNugetProgress.pathOnDisk));
+							currentNugetProgress.downloadPercent = 100;
+							ReportProgress();
+						}
+						else
+						{
+							IsDownloading = true;
+
+							string Url = mManager.mParams.remoteNugetPath + nuget.GetNugetPath();
+
+							// HERE YOU CAN SPECIFY IF YOU WANT FOLDER STRUCTURE
+							// OR JUST BUNCHA NUGETS AT ROOT
+							string downloadPath = mManager.mParams.stagingNugetPath + nuget.GetNugetPath().Replace("/", "\\");
+							string parentDir = Path.GetDirectoryName(downloadPath);
+							if (!Directory.Exists(parentDir))
+							{
+								Directory.CreateDirectory(parentDir);
+							}
+							currentNugetProgress.pathOnDisk = downloadPath;
+
+							WriteConsole(String.Format("Downloading from '{1}' to '{0}'", downloadPath, Url));
+
+							webClient.DownloadFileAsync(new Uri(Url), downloadPath);
+
+							while (IsDownloading)
+							{
+								if (isAborting)
+								{
+									return;
+								}
+								Thread.Sleep(200);
+							}
+						}
+
+						ProcessNugetDependencies();
+
+					}
+					catch (Exception ex)
+					{
+						WriteConsole("Error in worker thread: " + ex.Message);
+						if (nuget != null)
+						{
+							mManager.ForceAddNugetToQueue(nuget);
+						}
+						workerFailureCount += 1;
+						if (workerFailureCount > MAX_FAILURE_COUNT)
+						{
+							WriteConsole("Error: Too many failures. Bye!");
+							mManager.RaiseTheFlagOfError();
+							return;
+						}
 						continue;
 					}
-					IsProcessing = true;
-					WriteConsole(String.Format("Processing {0}", nuget.GetFileName()));
-					currentNugetProgress = new NugetProgressItem(nuget);
-					ReportProgress();
-
-					if (isNugetAlreadyInLocal())
-					{
-						currentNugetProgress.downloadPercent = 100;
-						ReportProgress();
-					}
-					else
-					{
-						string Url = mManager.mParams.remoteNugetPath + nuget.GetNugetPath();
-
-						// HERE YOU CAN SPECIFY IF YOU WANT FOLDER STRUCTURE
-						// OR JUST BUNCHA NUGETS AT ROOT
-						string downloadPath = mManager.mParams.stagingNugetPath + nuget.GetFileName();
-						currentNugetProgress.pathOnDisk = downloadPath;
-
-						WriteConsole(String.Format("Downloading to '{0}'", downloadPath));
-
-						IsDownloading = true;
-						webClient.DownloadDataAsync(new Uri(Url), downloadPath);
-
-						while (IsDownloading)
-						{
-							if (isAborting)
-							{
-								return;
-							}
-							Thread.Sleep(200);
-						}
-					}
-
-					ProcessNugetDependencies();
-
-				}
-				catch (Exception ex)
-				{
-					WriteConsole("Error in worker thread: " + ex.Message);
-					if (nuget != null)
-					{
-						mManager.ForceAddNugetToQueue(nuget);
-					}
-					continue;
 				}
 			}
-			WriteConsole("Thread Exited");
+			finally
+			{
+				IsFinished = true;
+				WriteConsole("Thread Exited");
+			}
 		}
 
 		public void DownloadProgress(object sender, DownloadProgressChangedEventArgs args)
@@ -136,7 +164,7 @@ namespace NugetDownloader
 			ReportProgress();
 		}
 
-		public void DownloadCompleted(object sender, DownloadDataCompletedEventArgs args)
+		public void DownloadCompleted(object sender, AsyncCompletedEventArgs args)
 		{
 			currentNugetProgress.downloadPercent = 100;
 			IsDownloading = false;
@@ -146,14 +174,28 @@ namespace NugetDownloader
 		public bool isNugetAlreadyInLocal()
 		{
 			// search main nuget path
-			string mainPath = mManager.mParams.localNugetPath + currentNugetProgress.nuget.GetFileName();
+			string mainFile = mManager.mParams.localNugetPath + currentNugetProgress.nuget.GetFileName();
+			if (File.Exists(mainFile))
+			{
+				currentNugetProgress.pathOnDisk = mainFile;
+				return true;
+			}
+			// search main nuget path
+			string mainPath = mManager.mParams.localNugetPath + currentNugetProgress.nuget.GetNugetPath();
 			if (File.Exists(mainPath))
 			{
 				currentNugetProgress.pathOnDisk = mainPath;
 				return true;
 			}
 			// search staging nuget path
-			string stagingPath = mManager.mParams.stagingNugetPath + currentNugetProgress.nuget.GetFileName();
+			string stagingFile = mManager.mParams.stagingNugetPath + currentNugetProgress.nuget.GetFileName();
+			if (File.Exists(stagingFile))
+			{
+				currentNugetProgress.pathOnDisk = stagingFile;
+				return true;
+			}
+			// search staging nuget path
+			string stagingPath = mManager.mParams.stagingNugetPath + currentNugetProgress.nuget.GetNugetPath();
 			if (File.Exists(stagingPath))
 			{
 				currentNugetProgress.pathOnDisk = stagingPath;
@@ -164,7 +206,102 @@ namespace NugetDownloader
 
 		private void ProcessNugetDependencies()
 		{
-			//TODO
+
+			string sourcePath = currentNugetProgress.pathOnDisk;
+			string tempFolder = Path.GetTempPath() + "NugetDownloader\\" + currentNugetProgress.nuget.GetFolderName();
+			try
+			{
+				if (!File.Exists(sourcePath))
+				{
+					throw new Exception(String.Format("File {0} not found.", sourcePath));
+				}
+				if (Directory.Exists(tempFolder))
+				{
+					Directory.Delete(tempFolder, true);
+				}
+
+				try
+				{
+					// separate try catch for extracting nuget, because if failure, then we should delete and redownload.
+					using (ZipArchive za = ZipFile.Open(sourcePath, ZipArchiveMode.Read))
+					{
+						za.ExtractToDirectory(tempFolder);
+						za.Dispose();
+					}
+				}
+				catch
+				{
+					// problem specifically with extracting.
+					// going to delete the source path on disk
+					// because it is probably corrupt.
+					File.Delete(currentNugetProgress.pathOnDisk);
+					// and throw to try to redownload.
+					throw;
+				}
+
+				string nuspecPath = tempFolder + currentNugetProgress.nuget.name + ".nuspec";
+				XmlDocument nuspecDoc = new XmlDocument();
+				using (XmlTextReader xtr = new XmlTextReader(nuspecPath))
+				{
+					xtr.Namespaces = false;
+					nuspecDoc.Load(xtr);
+				}
+				XmlElement xDependencies = (XmlElement)nuspecDoc.SelectSingleNode("package/metadata/dependencies");
+
+				if (xDependencies == null)
+				{
+					// cool, no dependencies?
+					// we are done.
+					return;
+				}
+
+				// BIG TODO
+				// was planning for some framework version number string comparison,
+				// but for now going by exact match only.
+				XmlElement xMatchGroup = null;
+				foreach (XmlElement xGroup in xDependencies.SelectNodes("group"))
+				{
+					string targetFramework = xGroup.GetAttribute("targetFramework");
+					//if (targetFramework.StartsWith(mManager.mParams.framework))
+					//{
+					//	string frameworkVersion = targetFramework.Substring(mManager.mParams.framework.Length);
+					//	if (mManager.mParams.frameworkVersion.CompareTo(frameworkVersion) > 0)
+					//	{
+					//		xMatchGroup = xGroup;
+					//	}
+					//}
+					if (targetFramework == (mManager.mParams.framework + mManager.mParams.frameworkVersion))
+					{
+						xMatchGroup = xGroup;
+					}
+				}
+
+				if (xMatchGroup == null)
+				{
+					//we have an inferior framework version, probably not supported.
+					WriteConsole(String.Format(
+						"Warning: no matching dependencies for '{0}'",
+						currentNugetProgress.nuget.GetFileName()
+					));
+					mManager.RaiseTheFlagOfWarning();
+					return;
+				}
+
+				foreach (XmlElement xDependency in xMatchGroup.SelectNodes("dependency"))
+				{
+					string name = xDependency.GetAttribute("id");
+					string version = xDependency.GetAttribute("version");
+					Nuget nuget = new Nuget(name, version);
+					mManager.AddNugetToQueue(nuget);
+				}
+			}
+			finally
+			{
+				if (Directory.Exists(tempFolder))
+				{
+					Directory.Delete(tempFolder, true);
+				}
+			}
 		}
 
 		public void Dispose()
