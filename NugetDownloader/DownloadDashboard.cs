@@ -15,6 +15,7 @@ namespace NugetDownloader
 		public NugetManager mNugetManager;
 
 		private const int CONSOLE_MAX_ITEM_COUNT = 5000;
+		private const string PROGRESS_BAR_NAME = "PROGRESS_BAR_NAME";
 
 		private Timer consoleTimer = new Timer();
 
@@ -55,17 +56,40 @@ namespace NugetDownloader
 
 		private void HandleProgressChanged(object sender, NugetProgressArgs e)
 		{
-			Nuget nuget = e.nugetProgress.nuget;
+			NugetProgressItem progress = e.nugetProgress;
+			Nuget nuget = progress.nuget;
 			string key = nuget.GetFileName();
+			GroupBox infoBox;
 			if (!progressDict.ContainsKey(key))
 			{
-				GroupBox infoBox = new GroupBox();
-				infoBox.Text = key;
-				infoBox.Width = 300;
-				infoBox.Height = 60;
+				infoBox = CreateNewProgressBox(key);
 				progressDict.Add(key, infoBox);
 				tlpDownloads.Controls.Add(infoBox);
 			}
+			else
+			{
+				infoBox = progressDict[key];
+			}
+			ProgressBar bar = (ProgressBar)infoBox.Controls.Find(PROGRESS_BAR_NAME, false)[0];
+			bar.Value = progress.downloadPercent;
+		}
+
+		private GroupBox CreateNewProgressBox(string name)
+		{
+			GroupBox infoBox = new GroupBox();
+			infoBox.Text = name;
+			infoBox.Width = 300;
+			infoBox.Height = 60;
+
+			ProgressBar bar = new ProgressBar();
+			bar.Name = PROGRESS_BAR_NAME;
+			bar.Top = 20;
+			bar.Left = 10;
+			bar.Height = 10;
+			bar.Width = 280;
+			infoBox.Controls.Add(bar);
+
+			return infoBox;
 		}
 
 		//private void HandleWroteConsole(NugetManager manager, WriteConsoleArgs args)

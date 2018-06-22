@@ -24,7 +24,7 @@ namespace NugetDownloader
 		private List<NugetDownloaderWorker> mWorkers = new List<NugetDownloaderWorker>();
 
 		private bool mIsStarted = false;
-		private NugetManagerParams mP;
+		public NugetManagerParams mParams;
 		private object mNugetLock = new object();
 
 		private ConcurrentQueue<Nuget> mNugetsToProcess = new ConcurrentQueue<Nuget>();
@@ -37,7 +37,7 @@ namespace NugetDownloader
 
 		public NugetManager(NugetManagerParams p)
 		{
-			mP = p;
+			mParams = p;
 		}
 
 		public void WriteConsole(string message)
@@ -114,7 +114,7 @@ namespace NugetDownloader
 			}
 			mIsStarted = true;
 
-			foreach (Nuget nuget in mP.nugetsToDownload) {
+			foreach (Nuget nuget in mParams.nugetsToDownload) {
 				AddNugetToQueue(nuget);
 			}
 

@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
 using System.ComponentModel;
+using System.Net;
+using System.IO;
 
 namespace NugetDownloader
 {
@@ -16,8 +18,12 @@ namespace NugetDownloader
 		private int mId;
 		public bool IsProcessing { get; private set; } = true;
 
+		private bool IsDownloading = false;
 		private bool isAborting = false;
 		private BackgroundWorker mWorker;
+		private WebClient webClient;
+
+		private NugetProgressItem currentNugetProgress;
 
 		public delegate void PropsHandleProgressChanged(NugetDownloaderWorker m, ProgressChangedEventArgs e);
 
@@ -25,15 +31,21 @@ namespace NugetDownloader
 		{
 			mManager = pManager;
 			mId = pId;
+
+			webClient = new WebClient();
+			webClient.DownloadProgressChanged += new DownloadProgressChangedEventHandler(DownloadProgress);
+			webClient.DownloadDataCompleted += new DownloadDataCompletedEventHandler(DownloadCompleted);
+
 			mWorker = worker;
 			mWorker.WorkerReportsProgress = true;
 			mWorker.WorkerSupportsCancellation = true;
 			mWorker.DoWork += new DoWorkEventHandler(ProcessUntilDone);
+
 		}
 
-		private void ReportProgress(NugetProgressItem nugetProgress)
+		private void ReportProgress()
 		{
-			mWorker.ReportProgress(0, nugetProgress);
+			mWorker.ReportProgress(0, currentNugetProgress);
 		}
 
 
@@ -70,11 +82,39 @@ namespace NugetDownloader
 					}
 					IsProcessing = true;
 					WriteConsole(String.Format("Processing {0}", nuget.GetFileName()));
-					NugetProgressItem progress = new NugetProgressItem(nuget);
-					ReportProgress(progress);
+					currentNugetProgress = new NugetProgressItem(nuget);
+					ReportProgress();
 
-					Thread.Sleep(2000 + rand.Next(5000));
-					mManager.ForceAddNugetToQueue(nuget);
+					if (isNugetAlreadyInLocal())
+					{
+						currentNugetProgress.downloadPercent = 100;
+						ReportProgress();
+					}
+					else
+					{
+						string Url = mManager.mParams.remoteNugetPath + nuget.GetNugetPath();
+
+						// HERE YOU CAN SPECIFY IF YOU WANT FOLDER STRUCTURE
+						// OR JUST BUNCHA NUGETS AT ROOT
+						string downloadPath = mManager.mParams.stagingNugetPath + nuget.GetFileName();
+						currentNugetProgress.pathOnDisk = downloadPath;
+
+						WriteConsole(String.Format("Downloading to '{0}'", downloadPath));
+
+						IsDownloading = true;
+						webClient.DownloadDataAsync(new Uri(Url), downloadPath);
+
+						while (IsDownloading)
+						{
+							if (isAborting)
+							{
+								return;
+							}
+							Thread.Sleep(200);
+						}
+					}
+
+					ProcessNugetDependencies();
 
 				}
 				catch (Exception ex)
@@ -90,11 +130,50 @@ namespace NugetDownloader
 			WriteConsole("Thread Exited");
 		}
 
+		public void DownloadProgress(object sender, DownloadProgressChangedEventArgs args)
+		{
+			currentNugetProgress.downloadPercent = args.ProgressPercentage;
+			ReportProgress();
+		}
+
+		public void DownloadCompleted(object sender, DownloadDataCompletedEventArgs args)
+		{
+			currentNugetProgress.downloadPercent = 100;
+			IsDownloading = false;
+			ReportProgress();
+		}
+
+		public bool isNugetAlreadyInLocal()
+		{
+			// search main nuget path
+			string mainPath = mManager.mParams.localNugetPath + currentNugetProgress.nuget.GetFileName();
+			if (File.Exists(mainPath))
+			{
+				currentNugetProgress.pathOnDisk = mainPath;
+				return true;
+			}
+			// search staging nuget path
+			string stagingPath = mManager.mParams.stagingNugetPath + currentNugetProgress.nuget.GetFileName();
+			if (File.Exists(stagingPath))
+			{
+				currentNugetProgress.pathOnDisk = stagingPath;
+				return true;
+			}
+			return false;
+		}
+
+		private void ProcessNugetDependencies()
+		{
+			//TODO
+		}
+
 		public void Dispose()
 		{
 			isAborting = true;
 			mWorker.CancelAsync();
 			mWorker.Dispose();
+			webClient.CancelAsync();
+			webClient.Dispose();
 		}
 	}
 }

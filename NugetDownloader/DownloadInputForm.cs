@@ -196,10 +196,10 @@ namespace NugetDownloader
 			}
 
 			NugetManagerParams p = new NugetManagerParams();
-			p.localNugetPath = txtLocalNugetPath.Text;
-			p.stagingNugetPath = txtStagingNugetPath.Text;
-			p.remoteNugetPath = txtRemoteNugetPath.Text;
-			p.outputReportPath = txtOutputReportPath.Text;
+			p.localNugetPath = ensureEndsWithSlash(txtLocalNugetPath.Text);
+			p.stagingNugetPath = ensureEndsWithSlash(txtStagingNugetPath.Text);
+			p.remoteNugetPath = ensureEndsWithSlash(txtRemoteNugetPath.Text);
+			p.outputReportPath = ensureEndsWithSlash(txtOutputReportPath.Text);
 
 			p.framework = txtFramework.Text;
 			p.frameworkVersion = txtFrameworkVersion.Text;
@@ -214,6 +214,15 @@ namespace NugetDownloader
 
 			DownloadDashboard form = new DownloadDashboard(p);
 			form.Show();
+		}
+
+		private string ensureEndsWithSlash(string path)
+		{
+			if (path.EndsWith("\\") || path.EndsWith("/"))
+			{
+				return path;
+			}
+			return path + "/";
 		}
 	}
 }
