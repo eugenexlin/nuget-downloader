@@ -14,6 +14,8 @@ namespace NugetDownloader
 		// major.minor.patch[-suffix]
 		public string version;
 
+		public int failCount = 0;
+
 		public static Regex versionRegex = new Regex("\\d+\\.\\d+\\.\\d+(\\-[0-9A-Za-z-]+)?");
 
 		//pass in nuget path

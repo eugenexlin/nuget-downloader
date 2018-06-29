@@ -52,7 +52,9 @@ namespace NugetDownloader
 		{
 			e.DrawBackground();
 			e.DrawFocusRectangle();
-			e.Graphics.DrawString(lbConsole.Items[e.Index].ToString(), e.Font, new SolidBrush(e.ForeColor), e.Bounds);
+			string message = lbConsole.Items[e.Index].ToString();
+			Color color = (message.ToLower().Contains("error") ? Color.Red : e.ForeColor);
+			e.Graphics.DrawString(message, e.Font, new SolidBrush(color), e.Bounds);
 		}
 
 		private void consoleTick(object sender, EventArgs args)

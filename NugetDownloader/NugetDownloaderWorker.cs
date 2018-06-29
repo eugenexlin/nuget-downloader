@@ -14,15 +14,13 @@ namespace NugetDownloader
 {
 	public class NugetDownloaderWorker
 	{
-		private static Random rand = new Random();
-
 		private NugetManager mManager;
 		private int mId;
 		public bool IsProcessing { get; private set; } = true;
 		public bool IsFinished { get; private set; } = false;
 
-		private int workerFailureCount = 0;
-		private const int MAX_FAILURE_COUNT = 3;
+		//private int workerFailureCount = 0;
+		private const int MAX_PACKAGE_FAILURE_COUNT = 5;
 
 		private bool IsDownloading = false;
 		private bool isAborting = false;
@@ -118,7 +116,7 @@ namespace NugetDownloader
 							}
 							currentNugetProgress.pathOnDisk = downloadPath;
 
-							WriteConsole(String.Format("Downloading from '{1}' to '{0}'", downloadPath, Url));
+							WriteConsole(String.Format("Downloading from '{0}' to '{1}'", Url, downloadPath));
 
 							webClient.DownloadFileAsync(new Uri(Url), downloadPath);
 
@@ -140,15 +138,22 @@ namespace NugetDownloader
 						WriteConsole("Error in worker thread: " + ex.ToString());
 						if (nuget != null)
 						{
-							mManager.ForceAddNugetToQueue(nuget);
+							nuget.failCount += 1;
+							if (nuget.failCount >= MAX_PACKAGE_FAILURE_COUNT)
+							{
+								WriteConsole(String.Format("Error: '{0}' failed too many times. Bye!", nuget.GetFileName()));
+								mManager.RaiseTheFlagOfError();
+							}
+							else
+							{
+								mManager.ForceAddNugetToQueue(nuget);
+							}
 						}
-						workerFailureCount += 1;
-						if (workerFailureCount > MAX_FAILURE_COUNT)
-						{
-							WriteConsole("Error: Too many failures. Bye!");
-							mManager.RaiseTheFlagOfError();
-							return;
-						}
+						//workerFailureCount += 1;
+						//if (workerFailureCount > MAX_FAILURE_COUNT)
+						//{
+						//	return;
+						//}
 						continue;
 					}
 				}
@@ -224,6 +229,11 @@ namespace NugetDownloader
 				if (Directory.Exists(tempFolder))
 				{
 					Directory.Delete(tempFolder, true);
+				}
+
+				if (currentNugetProgress.nuget.id.Contains("ext"))
+				{
+					throw new Exception("failfish");
 				}
 
 				try

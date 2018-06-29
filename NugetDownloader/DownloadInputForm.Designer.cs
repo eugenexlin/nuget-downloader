@@ -34,6 +34,10 @@
 			this.btnDownload = new System.Windows.Forms.Button();
 			this.txtNugets = new System.Windows.Forms.TextBox();
 			this.label5 = new System.Windows.Forms.Label();
+			this.label10 = new System.Windows.Forms.Label();
+			this.txtFrameworkVersion = new System.Windows.Forms.TextBox();
+			this.label9 = new System.Windows.Forms.Label();
+			this.txtFramework = new System.Windows.Forms.ComboBox();
 			this.btnDefault = new System.Windows.Forms.Button();
 			this.txtRemoteNugetPath = new System.Windows.Forms.TextBox();
 			this.label6 = new System.Windows.Forms.Label();
@@ -45,10 +49,6 @@
 			this.txtLocalNugetPath = new System.Windows.Forms.TextBox();
 			this.label2 = new System.Windows.Forms.Label();
 			this.label1 = new System.Windows.Forms.Label();
-			this.txtFramework = new System.Windows.Forms.ComboBox();
-			this.label9 = new System.Windows.Forms.Label();
-			this.txtFrameworkVersion = new System.Windows.Forms.TextBox();
-			this.label10 = new System.Windows.Forms.Label();
 			((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
 			this.splitContainer1.Panel1.SuspendLayout();
 			this.splitContainer1.Panel2.SuspendLayout();
@@ -93,7 +93,7 @@
 			// 
 			// label8
 			// 
-			this.label8.Location = new System.Drawing.Point(9, 50);
+			this.label8.Location = new System.Drawing.Point(12, 54);
 			this.label8.Name = "label8";
 			this.label8.Size = new System.Drawing.Size(310, 38);
 			this.label8.TabIndex = 13;
@@ -101,7 +101,7 @@
 			// 
 			// label7
 			// 
-			this.label7.Location = new System.Drawing.Point(12, 13);
+			this.label7.Location = new System.Drawing.Point(12, 16);
 			this.label7.Name = "label7";
 			this.label7.Size = new System.Drawing.Size(310, 38);
 			this.label7.TabIndex = 12;
@@ -135,6 +135,43 @@
 			this.label5.Size = new System.Drawing.Size(289, 13);
 			this.label5.TabIndex = 8;
 			this.label5.Text = "Desired Nuget Packages (line separated url or nupkg name)";
+			// 
+			// label10
+			// 
+			this.label10.AutoSize = true;
+			this.label10.Location = new System.Drawing.Point(130, 190);
+			this.label10.Name = "label10";
+			this.label10.Size = new System.Drawing.Size(42, 13);
+			this.label10.TabIndex = 14;
+			this.label10.Text = "Version";
+			// 
+			// txtFrameworkVersion
+			// 
+			this.txtFrameworkVersion.Location = new System.Drawing.Point(133, 206);
+			this.txtFrameworkVersion.Name = "txtFrameworkVersion";
+			this.txtFrameworkVersion.Size = new System.Drawing.Size(74, 20);
+			this.txtFrameworkVersion.TabIndex = 13;
+			// 
+			// label9
+			// 
+			this.label9.AutoSize = true;
+			this.label9.Location = new System.Drawing.Point(4, 190);
+			this.label9.Name = "label9";
+			this.label9.Size = new System.Drawing.Size(93, 13);
+			this.label9.TabIndex = 12;
+			this.label9.Text = "Target Framework";
+			// 
+			// txtFramework
+			// 
+			this.txtFramework.FormattingEnabled = true;
+			this.txtFramework.Items.AddRange(new object[] {
+            ".NETFramework",
+            ".NETCore",
+            ".NETStandard"});
+			this.txtFramework.Location = new System.Drawing.Point(7, 206);
+			this.txtFramework.Name = "txtFramework";
+			this.txtFramework.Size = new System.Drawing.Size(120, 21);
+			this.txtFramework.TabIndex = 11;
 			// 
 			// btnDefault
 			// 
@@ -234,43 +271,6 @@
 			this.label1.Size = new System.Drawing.Size(53, 13);
 			this.label1.TabIndex = 0;
 			this.label1.Text = "Settings";
-			// 
-			// txtFramework
-			// 
-			this.txtFramework.FormattingEnabled = true;
-			this.txtFramework.Items.AddRange(new object[] {
-            ".NETFramework",
-            ".NETCore",
-            ".NETStandard"});
-			this.txtFramework.Location = new System.Drawing.Point(7, 206);
-			this.txtFramework.Name = "txtFramework";
-			this.txtFramework.Size = new System.Drawing.Size(120, 21);
-			this.txtFramework.TabIndex = 11;
-			// 
-			// label9
-			// 
-			this.label9.AutoSize = true;
-			this.label9.Location = new System.Drawing.Point(4, 190);
-			this.label9.Name = "label9";
-			this.label9.Size = new System.Drawing.Size(93, 13);
-			this.label9.TabIndex = 12;
-			this.label9.Text = "Target Framework";
-			// 
-			// txtFrameworkVersion
-			// 
-			this.txtFrameworkVersion.Location = new System.Drawing.Point(133, 206);
-			this.txtFrameworkVersion.Name = "txtFrameworkVersion";
-			this.txtFrameworkVersion.Size = new System.Drawing.Size(74, 20);
-			this.txtFrameworkVersion.TabIndex = 13;
-			// 
-			// label10
-			// 
-			this.label10.AutoSize = true;
-			this.label10.Location = new System.Drawing.Point(130, 190);
-			this.label10.Name = "label10";
-			this.label10.Size = new System.Drawing.Size(42, 13);
-			this.label10.TabIndex = 14;
-			this.label10.Text = "Version";
 			// 
 			// DownloadInputForm
 			// 
