@@ -230,12 +230,7 @@ namespace NugetDownloader
 				{
 					Directory.Delete(tempFolder, true);
 				}
-
-				if (currentNugetProgress.nuget.id.Contains("ext"))
-				{
-					throw new Exception("failfish");
-				}
-
+				
 				try
 				{
 					// separate try catch for extracting nuget, because if failure, then we should delete and redownload.
